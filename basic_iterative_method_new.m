@@ -13,6 +13,7 @@ function x_adv = basic_iterative_method_new(dlnet,dl_x,dl_y,alpha,epsilon,num_it
         % Apply adversarial perturbations to the data.
         gradient = dlfeval(@model_gradients_input_new,dlnet,dl_x+delta,dl_y,lambda);
         delta = delta + alpha*sign(gradient);
+        %delta = delta + epsilon*sign(gradient);
         delta(delta > epsilon) = epsilon;
         delta(delta < -epsilon) = -epsilon;
     end
