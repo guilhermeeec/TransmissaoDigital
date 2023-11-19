@@ -11,7 +11,10 @@ function error = generate_dataset_clean(N_samples,SNR,K,filename,filename_origin
     H = zeros(N_samples, 4*N);
     H_original = zeros(N_samples, 2*N);
     errors = zeros(1, N_samples);
-    pilot_symbols = (rand(1,N)+1i*rand(1,N))';  % Símbolos combinados para estimação de canal
+    pilot_symbols = get_pilot();  % Símbolos combinados para estimação de canal
+    
+    received_signals = zeros(N_samples, 2*N);
+    received_signals_filename = '..\databases\received.csv';
 
     for sample_index = 1:N_samples
         [h_coef,h_coef_noisy,h_FFT,h_FFT_noisy]= generate_random_channel(SNR,v,fc,L,fs,N_FFT);
@@ -43,9 +46,14 @@ function error = generate_dataset_clean(N_samples,SNR,K,filename,filename_origin
         h_FFT_imag = imag(h_FFT);
 
         H_original(sample_index,:) = horzcat(h_FFT_real',h_FFT_imag');
+        
+        z_real = real(z);
+        z_imag = imag(z);
+        received_signals(sample_index,:) = horzcat(z_real', z_imag');
     end
     
     error = mean(errors);
     writematrix(H,filename);
     writematrix(H_original,filename_original);
+    writematrix(received_signals,received_signals_filename);
 end
