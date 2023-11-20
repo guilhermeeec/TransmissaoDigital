@@ -8,7 +8,7 @@ function [mse_metric,ls_metric] = poison_eavesdrop(dlnet,fgsm_power,test_name,te
     x_test_ds = arrayDatastore(x_test);
    
     % Lê base de dados com canal real
-    %y_test_orig = readmatrix(test_name_orig);
+    y_test_orig = readmatrix(test_name_orig);
     %y_test_orig_ds = arrayDatastore(y_test_orig);
     
     % Estimativa LS x canal (com ruído)
@@ -41,10 +41,10 @@ function [mse_metric,ls_metric] = poison_eavesdrop(dlnet,fgsm_power,test_name,te
     N = 1024;
     K = 5; 
     L = 10;
-    received = readmatrix('..\databases\received.csv');
+    received = readmatrix('..\databases\received.csv'); %ok
     retrieved_users = zeros(size(received,1),N);
     for n=1:N
-        retrieved_users(:,n) = received(:,n)+1j*received(:,n+N);
+        retrieved_users(:,n) = received(:,n) + 1j*received(:,n+N);
     end
     
     % Envia sinal pelo canal
@@ -75,15 +75,15 @@ function [mse_metric,ls_metric] = poison_eavesdrop(dlnet,fgsm_power,test_name,te
                 perturbation(n) = pert(n)+1j*pert(n+N);
             end
 
-            % Multiplica ponto a ponto piloto, perturbação e divide ponto a
+            % Multiplica ponto a ponto piloto com perturbação e divide ponto a
             % ponto pela resposta em frequência do canal
             [~,pilot_symbols] = generate_transmitter_signal(N,K);
             signal = (perturbation.*pilot_symbols)./h_fft;
-            var = signal_power(signal);
 
-            % Gera sinal aproximado
-            s = var * normalize_signal(perturbation);
-            s_time = ifft(s,N);
+            % Gera sinal real (não aproximado)
+            %s = var * normalize_signal(perturbation);
+            s = signal;
+            s_time = sqrt(N)*ifft(s,N);
             A_cp = [zeros(K,N-K) eye(K); eye(N)];
             s_time = A_cp * s_time;
 
@@ -92,9 +92,9 @@ function [mse_metric,ls_metric] = poison_eavesdrop(dlnet,fgsm_power,test_name,te
             retrieved_attacker = generate_received_signal(z,N,K); 
             
             % Mistura com sinal do usuário
-            retrieved_user = retrieved_users(index,:)';
-            %retrieved_symbols = retrieved_user + retrieved_attacker;
-            retrieved_symbols = retrieved_user;
+            retrieved_user = retrieved_users(index,:).';
+            retrieved_symbols = retrieved_user + retrieved_attacker;
+            %retrieved_symbols = retrieved_user;
             
             % Faz estimação de canal
             h_LS = retrieved_symbols./pilot_symbols;
