@@ -17,7 +17,7 @@ function pertubations = adversarial_examples_eavesdrop(dlnet,mbq,epsilon,alpha,n
         pertubations_mbq = basic_iterative_method_eavesdrop(dlnet,dl_x,dl_y,alpha,epsilon, ...
             num_iter,initialization);
 
-        pertunations{iteration} = pertubations_mbq;
+        pertubations{iteration} = pertubations_mbq;
     end
 
     % Concatenate.

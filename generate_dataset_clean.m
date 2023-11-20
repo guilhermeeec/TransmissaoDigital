@@ -13,7 +13,7 @@ function error = generate_dataset_clean(N_samples,SNR,K,filename,filename_origin
     errors = zeros(1, N_samples);
     pilot_symbols = get_pilot();  % Símbolos combinados para estimação de canal
     
-    received_signals = zeros(N_samples, 2*N);
+    received_signals = zeros(N_samples, 2*(N+K));
     received_signals_filename = '..\databases\received.csv';
 
     for sample_index = 1:N_samples

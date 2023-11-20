@@ -1,4 +1,4 @@
-function mse_metric = poison_dataset(dlnet,fgsm_power,test_name,test_name_orig,SNR,r)
+function [mse_metric,ls] = poison_dataset(dlnet,fgsm_power,test_name,test_name_orig,SNR,r)
     H = readmatrix(test_name);
     x_test = H(:,1:2048);
     y_test = H(:,2049:end);
@@ -23,6 +23,7 @@ function mse_metric = poison_dataset(dlnet,fgsm_power,test_name,test_name_orig,S
     alpha = 1.25 * epsilon; 
     
     [x_adv, y_pred_adv] = adversarial_examples(dlnet,mbq_test_fgsm,epsilon,alpha,num_adv_iter);
+    ls = immse(double(extractdata(x_adv)),y_test_orig');
 
     mse_metric = immse(double(extractdata(y_pred_adv)), y_test_orig');
 end
