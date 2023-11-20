@@ -13,7 +13,7 @@ function error = generate_dataset_clean(N_samples,SNR,K,filename,filename_origin
     errors = zeros(1, N_samples);
     pilot_symbols = get_pilot();  % Símbolos combinados para estimação de canal
     
-    received_signals = zeros(N_samples, 2*(N+K));
+    received_signals = zeros(N_samples, 2*N);
     received_signals_filename = '..\databases\received.csv';
 
     for sample_index = 1:N_samples
@@ -47,9 +47,9 @@ function error = generate_dataset_clean(N_samples,SNR,K,filename,filename_origin
 
         H_original(sample_index,:) = horzcat(h_FFT_real',h_FFT_imag');
         
-        z_real = real(z);
-        z_imag = imag(z);
-        received_signals(sample_index,:) = horzcat(z_real', z_imag');
+        retrieved_symbols_real = real(retrieved_symbols);
+        retrieved_symbols_imag = imag(retrieved_symbols);
+        received_signals(sample_index,:) = horzcat(retrieved_symbols_real', retrieved_symbols_imag');
     end
     
     error = mean(errors);

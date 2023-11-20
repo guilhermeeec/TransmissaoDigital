@@ -3,15 +3,14 @@ function [mse_metric,ls_metric] = poison_eavesdrop(dlnet,fgsm_power,test_name,te
     % Lê base de dados com estimativa LS nas labels
     H = readmatrix(test_name);
     x_test = H(:,1:2048);
-    y_test = H(:,2049:end);
-    y_test_orig_ds = arrayDatastore(y_test);
+    %y_test = H(:,2049:end);
     x_test_ds = arrayDatastore(x_test);
    
     % Lê base de dados com canal real
-    %y_test_orig = readmatrix(test_name_orig);
-    %y_test_orig_ds = arrayDatastore(y_test_orig);
+    y_test_orig = readmatrix(test_name_orig);
+    y_test_orig_ds = arrayDatastore(y_test_orig);
     
-    % Estimativa LS x canal (com ruído)
+    % Estimativa LS x canal real
     ds_test_orig = combine(x_test_ds, y_test_orig_ds);
     mini_batch_size = 50;
     mbq_test = minibatchqueue(ds_test_orig, ...
@@ -37,14 +36,14 @@ function [mse_metric,ls_metric] = poison_eavesdrop(dlnet,fgsm_power,test_name,te
     alpha = 1.25 * epsilon; 
     perturbations = adversarial_examples_eavesdrop(dlnet,mbq_test_fgsm,epsilon,alpha,num_adv_iter);
     
-    % Lê do arquivo os sinais do usuário recebidos 
+    % Lê sinais recebidos no arquivo
     N = 1024;
     K = 5; 
     L = 10;
     received = readmatrix('..\databases\received.csv');
-    retrieved_users = zeros(size(received,1),N);
-    for n=1:N
-        retrieved_users(:,n) = received(:,n)+1j*received(:,n+N);
+    z_users = zeros(size(received,1),(N+K));
+    for n=1:(N+K)
+        z_users(:,n) = received(:,n)+1j*received(:,n+N+K);
     end
     
     % Envia sinal pelo canal
@@ -89,13 +88,12 @@ function [mse_metric,ls_metric] = poison_eavesdrop(dlnet,fgsm_power,test_name,te
 
             % Envia sinal aproximado pelo canal
             z = fftfilt(h, s_time);
-            retrieved_attacker = generate_received_signal(z,N,K); 
             
             % Mistura com sinal do usuário
-            retrieved_user = retrieved_users(index,:)';
-            %retrieved_symbols = retrieved_user + retrieved_attacker;
-            retrieved_symbols = retrieved_user;
-            
+            z_user = z_users(index,:)';
+            z = z + z_user;  
+            retrieved_symbols = generate_received_signal(z,N,K); % erro
+
             % Faz estimação de canal
             h_LS = retrieved_symbols./pilot_symbols;
 
