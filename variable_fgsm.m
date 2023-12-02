@@ -30,17 +30,17 @@ generate_dataset_clean(1000,snr,5,test_name,test_name_orig);
 %for fgsm_power = [0.05 0.1 0.75]  
 for fgsm_power = [0.75]    
     
-    error_nn_fgsm = poison_dataset(dlnet_trad,fgsm_power,test_name,test_name_orig,snr,0);
-    errors_nn_fgsm = [errors_nn_fgsm error_nn_fgsm]
+    %error_nn_fgsm = poison_dataset(dlnet_trad,fgsm_power,test_name,test_name_orig,snr,0);
+    %errors_nn_fgsm = [errors_nn_fgsm error_nn_fgsm]
     
     % Rede robusta
-    dlnet_robust = train_network_adversarial(layers,num_epochs,train_name,1.2*fgsm_power,0,0,snr);
+    %dlnet_robust = train_network_adversarial(layers,num_epochs,train_name,1.2*fgsm_power,0,0,snr);
     
-    error_nn_robust = test_network(dlnet_robust,test_name,test_name_orig);
+    %error_nn_robust = test_network(dlnet_robust,test_name,test_name_orig);
     errors_nn_robust = [errors_nn_robust error_nn_robust]
     
-    error_nn_robust_fgsm = poison_dataset(dlnet_robust,fgsm_power,test_name,test_name_orig,snr,0);
-    errors_nn_robust_fgsm = [errors_nn_robust_fgsm error_nn_robust_fgsm]
+    %error_nn_robust_fgsm = poison_dataset(dlnet_robust,fgsm_power,test_name,test_name_orig,snr,0);
+    %errors_nn_robust_fgsm = [errors_nn_robust_fgsm error_nn_robust_fgsm]
     
     % Rede melhorada
     dlnet_enhanced = train_network_adversarial(layers,num_epochs,train_name,1.2*fgsm_power,0.2,0.2,snr);

@@ -28,11 +28,14 @@ errors_nn_enhanced = [];
 errors_nn_enhanced_random = [];
 errors_nn_enhanced_fgsm = [];
 
+errors_nn_enhanced_eavesdrop = [];
+errors_ls_enhanced_eavesdrop = [];
+
 fgsm_power = 0.1;
 num_epochs = 200;
 
 for snr = [20 30 40]
-%for snr = [30 40]
+%for snr = [30]
     error_ls = generate_dataset_clean(3000,snr,5,train_name,train_name_orig);
     errors_ls = [errors_ls error_ls]
     
@@ -87,6 +90,11 @@ for snr = [20 30 40]
     [error_nn_enhanced_fgsm,error_ls_fgsm_enhanced] = poison_dataset(dlnet_enhanced,fgsm_power,test_name,test_name_orig,snr,0.2);
     errors_ls_fgsm_enhanced = [errors_ls_fgsm_enhanced error_ls_fgsm_enhanced]
     errors_nn_enhanced_fgsm = [errors_nn_enhanced_fgsm error_nn_enhanced_fgsm]
+    
+    [error_nn_eavesdrop_enhanced,error_ls_eavesdrop_enhanced] = poison_eavesdrop(dlnet_enhanced,0.1,test_name,test_name_orig,snr,0.2);
+    errors_nn_enhanced_eavesdrop = [errors_nn_enhanced_eavesdrop error_nn_eavesdrop_enhanced]
+    errors_ls_enhanced_eavesdrop = [errors_ls_enhanced_eavesdrop error_ls_eavesdrop_enhanced]
+    
     filename = sprintf('../workspaces/backup_%g.mat', snr);
     save(filename);
     
